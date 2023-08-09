@@ -1,0 +1,30 @@
+type Movie = record {
+  id : text;
+  status : text;
+  resume : text;
+  title : text;
+  updated_at : opt nat64;
+  created_at : nat64;
+  synopsis : text;
+  posterURL : text;
+  notes : text;
+  myRating : text;
+};
+type MoviePayload = record {
+  status : text;
+  resume : text;
+  title : text;
+  synopsis : text;
+  posterURL : text;
+  notes : text;
+  myRating : text;
+};
+type _AzleResult = variant { Ok : Movie; Err : text };
+type _AzleResult_1 = variant { Ok : vec Movie; Err : text };
+service : () -> {
+  LogMovie : (MoviePayload) -> (_AzleResult);
+  getAllMovies : () -> (_AzleResult_1) query;
+  getOneMovie : (text) -> (_AzleResult) query;
+  removeLoggedMovie : (text) -> (_AzleResult);
+  updateMovie : (text, MoviePayload) -> (_AzleResult);
+}
