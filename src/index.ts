@@ -73,7 +73,7 @@ export function getCallerID(): string {
 
 //Let now create a function to create a user
 $update;
-export function createMovieUser(username: string, user_password: string,): Result<User, string> {
+export function createMovieUser(username: string, user_password: string): Result<User, string> {
     const id = uuidv4();
     const ic_caller_id = getCallerID();
     const user: User = {
