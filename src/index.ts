@@ -16,8 +16,8 @@ import * as crypto from "crypto";
 
 type Movie = Record<{
     id: string;
-    user_id: string;
-    ic_caller_id: string;
+    userId: string; // Use camelCase for consistency
+    icCallerId: string; // Use camelCase for consistency
     title: string;
     synopsis: string;
     myRatingOutOfTen: string;
@@ -25,8 +25,8 @@ type Movie = Record<{
     status: "completed" | "still_watching";
     resume: string;
     notes: string;
-    created_at: nat64;
-    updated_at: Opt<nat64>;
+    createdAt: nat64; // Use camelCase for consistency
+    updatedAt: Opt<nat64>;
 }>;
 
 type MoviePayload = Record<{
@@ -41,24 +41,27 @@ type MoviePayload = Record<{
 
 type User = Record<{
     id: string;
-    ic_caller_id: string;
+    icCallerId: string; // Use camelCase for consistency
     username: string;
-    user_password: string;
-    created_at: nat64;
-    updated_at: Opt<nat64>;
+    userPassword: string; // Use camelCase for consistency
+    createdAt: nat64; // Use camelCase for consistency
+    updatedAt: Opt<nat64>;
 }>;
 
 type UserPayload = Record<{
     id: string;
     username: string;
-    user_password: string;
+    userPassword: string;
 }>;
 
-const movieStorage = new StableBTreeMap<string, Movie>(0, 44, 10_000);
-const userStorage = new StableBTreeMap<string, User>(0, 44, 1024);
+const STORAGE_CONFIG = {
+    NODE_SIZE: 44,
+    MAX_NODES: 10000,
+    MAX_USERS: 1024,
+};
 
 $query;
-export function getCallerID(): string {
+export function getCallerId(): string {
     return ic.caller().toString();
 }
 
@@ -72,17 +75,17 @@ function hashPassword(password: string): string {
 }
 
 $update;
-export function createMovieUser(username: string, user_password: string): Result<User, string> {
+export function createMovieUser(username: string, userPassword: string): Result<User, string> {
     const id = generateUUID();
-    const ic_caller_id = getCallerID();
-    const hashedPassword = hashPassword(user_password);
+    const icCallerId = getCallerId();
+    const hashedPassword = hashPassword(userPassword);
     const user: User = {
         id,
-        ic_caller_id,
+        icCallerId,
         username,
-        user_password: hashedPassword,
-        created_at: ic.time(),
-        updated_at: Opt.None
+        userPassword: hashedPassword,
+        createdAt: ic.time(),
+        updatedAt: Opt.None
     };
 
     userStorage.insert(user.id, user);
@@ -112,14 +115,14 @@ export function deleteUser(id: string): Result<User, string> {
 }
 
 $update;
-export function LogMovie(payload: MoviePayload, user_id: string): Result<Movie, string> {
-    const ic_caller_id = getCallerID();
+export function logMovie(payload: MoviePayload, userId: string): Result<Movie, string> {
+    const icCallerId = getCallerId();
     const movie: Movie = {
         id: generateUUID(),
-        user_id: user_id,
-        ic_caller_id: ic_caller_id,
-        created_at: ic.time(),
-        updated_at: Opt.None,
+        userId: userId,
+        icCallerId: icCallerId,
+        createdAt: ic.time(),
+        updatedAt: Opt.None,
         ...payload
     };
     movieStorage.insert(movie.id, movie);
@@ -143,9 +146,9 @@ $update;
 export function updateMovie(id: string, payload: MoviePayload): Result<Movie, string> {
     return match(movieStorage.get(id), {
         Some: (movie) => {
-            const updatedMessage: Movie = { ...movie, ...payload, updated_at: Opt.Some(ic.time()) };
-            movieStorage.insert(movie.id, updatedMessage);
-            return Result.Ok<Movie, string>(updatedMessage);
+            const updatedMovie: Movie = { ...movie, ...payload, updatedAt: Opt.Some(ic.time()) };
+            movieStorage.insert(movie.id, updatedMovie);
+            return Result.Ok<Movie, string>(updatedMovie);
         },
         None: () => Result.Err<Movie, string>(`Couldn't update a movie with the ID: ${id} because the movie was not found. Please check the ID and then try again.`)
     });
@@ -159,7 +162,6 @@ export function removeLoggedMovie(id: string): Result<Movie, string> {
     });
 }
 
-
 // a workaround to make uuid package work with Azle
 globalThis.crypto = {
     getRandomValues: () => {
@@ -172,3 +174,6 @@ globalThis.crypto = {
         return array
     }
 }
+
+const userStorage = new StableBTreeMap<string, User>(0, STORAGE_CONFIG.NODE_SIZE, STORAGE_CONFIG.MAX_USERS);
+const movieStorage = new StableBTreeMap<string, Movie>(0, STORAGE_CONFIG.NODE_SIZE, STORAGE_CONFIG.MAX_NODES);
