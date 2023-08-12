@@ -16,8 +16,8 @@ import * as crypto from "crypto";
 
 type Movie = Record<{
     id: string;
-    userId: string; // Use camelCase for consistency
-    icCallerId: string; // Use camelCase for consistency
+    userId: string;
+    icCallerId: string; 
     title: string;
     synopsis: string;
     myRatingOutOfTen: string;
@@ -25,7 +25,7 @@ type Movie = Record<{
     status: "completed" | "still_watching";
     resume: string;
     notes: string;
-    createdAt: nat64; // Use camelCase for consistency
+    createdAt: nat64; 
     updatedAt: Opt<nat64>;
 }>;
 
@@ -41,10 +41,10 @@ type MoviePayload = Record<{
 
 type User = Record<{
     id: string;
-    icCallerId: string; // Use camelCase for consistency
+    icCallerId: string; 
     username: string;
-    userPassword: string; // Use camelCase for consistency
-    createdAt: nat64; // Use camelCase for consistency
+    userPassword: string; 
+    createdAt: nat64;
     updatedAt: Opt<nat64>;
 }>;
 
