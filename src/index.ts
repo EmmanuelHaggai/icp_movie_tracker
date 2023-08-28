@@ -12,7 +12,6 @@ import {
     Opt
 } from "azle";
 import { v4 as uuidv4 } from "uuid";
-import * as crypto from "crypto";
 
 type Movie = Record<{
     id: string;
@@ -22,7 +21,7 @@ type Movie = Record<{
     synopsis: string;
     myRatingOutOfTen: string;
     posterURL: string;
-    status: "completed" | "still_watching";
+    status: string;
     resume: string;
     notes: string;
     createdAt: nat64;
@@ -34,7 +33,7 @@ type MoviePayload = Record<{
     synopsis: string;
     myRatingOutOfTen: string;
     posterURL: string;
-    status: "completed" | "still_watching";
+    status: string;
     resume: string;
     notes: string;
 }>;
@@ -43,7 +42,6 @@ type User = Record<{
     id: string;
     icCallerId: string;
     username: string;
-    userPassword: string;
     createdAt: nat64;
     updatedAt: Opt<nat64>;
 }>;
@@ -51,17 +49,10 @@ type User = Record<{
 type UserPayload = Record<{
     id: string;
     username: string;
-    userPassword: string;
 }>;
 
-const STORAGE_CONFIG = {
-    NODE_SIZE: 44,
-    MAX_NODES: 1024,
-    MAX_USERS: 1024,
-};
-
-const userStorage = new StableBTreeMap<string, User>(0, STORAGE_CONFIG.NODE_SIZE, STORAGE_CONFIG.MAX_USERS);
-const movieStorage = new StableBTreeMap<string, Movie>(0, STORAGE_CONFIG.NODE_SIZE, STORAGE_CONFIG.MAX_NODES);
+const userStorage = new StableBTreeMap<string, User>(0, 44, 1024);
+const movieStorage = new StableBTreeMap<string, Movie>(1, 44, 1048);
 
 $query;
 export function getCallerId(): string {
@@ -72,21 +63,14 @@ function generateUUID(): string {
     return uuidv4();
 }
 
-function hashPassword(password: string): string {
-    const hashedPassword = crypto.createHash("sha256").update(password).digest("hex");
-    return hashedPassword;
-}
-
 $update;
 export function createMovieUser(username: string, userPassword: string): Result<User, string> {
     const id = generateUUID();
     const icCallerId = getCallerId();
-    const hashedPassword = hashPassword(userPassword);
     const user: User = {
         id,
         icCallerId,
         username,
-        userPassword: hashedPassword,
         createdAt: ic.time(),
         updatedAt: Opt.None
     };
