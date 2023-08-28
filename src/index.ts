@@ -17,7 +17,7 @@ import * as crypto from "crypto";
 type Movie = Record<{
     id: string;
     userId: string;
-    icCallerId: string; 
+    icCallerId: string;
     title: string;
     synopsis: string;
     myRatingOutOfTen: string;
@@ -25,7 +25,7 @@ type Movie = Record<{
     status: "completed" | "still_watching";
     resume: string;
     notes: string;
-    createdAt: nat64; 
+    createdAt: nat64;
     updatedAt: Opt<nat64>;
 }>;
 
@@ -41,9 +41,9 @@ type MoviePayload = Record<{
 
 type User = Record<{
     id: string;
-    icCallerId: string; 
+    icCallerId: string;
     username: string;
-    userPassword: string; 
+    userPassword: string;
     createdAt: nat64;
     updatedAt: Opt<nat64>;
 }>;
@@ -56,9 +56,12 @@ type UserPayload = Record<{
 
 const STORAGE_CONFIG = {
     NODE_SIZE: 44,
-    MAX_NODES: 10000,
+    MAX_NODES: 1024,
     MAX_USERS: 1024,
 };
+
+const userStorage = new StableBTreeMap<string, User>(0, STORAGE_CONFIG.NODE_SIZE, STORAGE_CONFIG.MAX_USERS);
+const movieStorage = new StableBTreeMap<string, Movie>(0, STORAGE_CONFIG.NODE_SIZE, STORAGE_CONFIG.MAX_NODES);
 
 $query;
 export function getCallerId(): string {
@@ -174,6 +177,3 @@ globalThis.crypto = {
         return array
     }
 }
-
-const userStorage = new StableBTreeMap<string, User>(0, STORAGE_CONFIG.NODE_SIZE, STORAGE_CONFIG.MAX_USERS);
-const movieStorage = new StableBTreeMap<string, Movie>(0, STORAGE_CONFIG.NODE_SIZE, STORAGE_CONFIG.MAX_NODES);
