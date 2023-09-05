@@ -18,7 +18,7 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
  nvm use 18
  ```
 4. Make sure that you have DFX installed, if not, install from here [installation](https://demergent-labs.github.io/azle/installation.html).
-5. Reload your terminal (if using GitHub Codespaces)
+5. Reload your terminal
 6. Run the command below to get dfx started.
 ```bash 
 dfx start --background
