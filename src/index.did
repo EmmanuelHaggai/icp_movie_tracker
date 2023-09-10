@@ -3,12 +3,14 @@ type Movie = record {
   status : text;
   resume : text;
   title : text;
-  updated_at : opt nat64;
-  created_at : nat64;
+  userId : text;
+  createdAt : nat64;
+  updatedAt : opt nat64;
   synopsis : text;
   posterURL : text;
+  genres : text;
   notes : text;
-  myRating : text;
+  myRatingOutOfTen : float64;
 };
 type MoviePayload = record {
   status : text;
@@ -16,15 +18,31 @@ type MoviePayload = record {
   title : text;
   synopsis : text;
   posterURL : text;
+  genres : text;
   notes : text;
-  myRating : text;
+  myRatingOutOfTen : float64;
 };
-type _AzleResult = variant { Ok : Movie; Err : text };
+type User = record {
+  id : text;
+  fullName : text;
+  email : text;
+  updatedAt : opt nat64;
+  phone : text;
+  registeredAt : nat64;
+};
+type UserPayload = record { fullName : text; email : text; phone : text };
+type _AzleResult = variant { Ok : User; Err : text };
 type _AzleResult_1 = variant { Ok : vec Movie; Err : text };
+type _AzleResult_2 = variant { Ok : vec User; Err : text };
+type _AzleResult_3 = variant { Ok : Movie; Err : text };
 service : () -> {
-  LogMovie : (MoviePayload) -> (_AzleResult);
-  getAllMovies : () -> (_AzleResult_1) query;
-  getOneMovie : (text) -> (_AzleResult) query;
-  removeLoggedMovie : (text) -> (_AzleResult);
-  updateMovie : (text, MoviePayload) -> (_AzleResult);
+  DeleteUser : (text) -> (_AzleResult);
+  editUser : (text, UserPayload) -> (_AzleResult);
+  getCallerId : () -> (text) query;
+  getLoggedMovies : () -> (_AzleResult_1) query;
+  getMyUserProfile : () -> (_AzleResult_2) query;
+  logMovie : (MoviePayload) -> (_AzleResult_3);
+  registerUser : (UserPayload) -> (_AzleResult);
+  removeMovie : (text) -> (_AzleResult_3);
+  updateMovie : (text, MoviePayload) -> (_AzleResult_3);
 }
